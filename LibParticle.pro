@@ -14,6 +14,7 @@
 
 include($$PWD/../LibCommon/LibCommon.pri)
 INCLUDEPATH += $$PWD/
+INCLUDEPATH += $$PWD/LibParticle/PartioBgeo
 
 TARGET = LibParticle
 TEMPLATE = lib

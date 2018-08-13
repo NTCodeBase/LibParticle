@@ -15,8 +15,8 @@
 #include <Utils/MathHelpers.h>
 #include <ParallelHelpers/ParallelSTL.h>
 #include <ParallelHelpers/Scheduler.h>
-#include <ParticleTools/ParticleHelpers.h>
-#include <ParticleTools/ParticleSerialization.h>
+#include <LibParticle/ParticleHelpers.h>
+#include <LibParticle/ParticleSerialization.h>
 #include <Partio.h>
 
 #include <fstream>
