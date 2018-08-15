@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include <CommonSetup.h>
-#include <Data/DataIO.h>
+#include <LibCommon/CommonSetup.h>
+#include <LibCommon/Data/DataIO.h>
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 namespace ParticleHelpers

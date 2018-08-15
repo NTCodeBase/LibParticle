@@ -11,10 +11,10 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-#include <Utils/FileHelpers.h>
-#include <Utils/MathHelpers.h>
-#include <ParallelHelpers/ParallelSTL.h>
-#include <ParallelHelpers/Scheduler.h>
+#include <LibCommon/Utils/FileHelpers.h>
+#include <LibCommon/Utils/MathHelpers.h>
+#include <LibCommon/ParallelHelpers/ParallelSTL.h>
+#include <LibCommon/ParallelHelpers/Scheduler.h>
 #include <LibParticle/ParticleHelpers.h>
 #include <LibParticle/ParticleSerialization.h>
 #include <Partio.h>
