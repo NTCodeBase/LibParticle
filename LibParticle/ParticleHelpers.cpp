@@ -12,7 +12,7 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 #include <LibCommon/Utils/FileHelpers.h>
-#include <LibCommon/Utils/MathHelpers.h>
+#include <LibCommon/Math/MathHelpers.h>
 #include <LibCommon/ParallelHelpers/ParallelSTL.h>
 #include <LibCommon/ParallelHelpers/Scheduler.h>
 #include <LibParticle/ParticleHelpers.h>
@@ -53,8 +53,7 @@ void compress(const StdVT_VecX<N, RealType>& dvec, VecX<N, RealType>& dMin, VecX
 
     compressedData.resize(N * dvec.size());
     Scheduler::parallel_for(dvec.size(),
-                            [&](size_t i)
-                            {
+                            [&](size_t i) {
                                 const auto& vec = dvec[i];
                                 for(int j = 0; j < N; ++j) {
                                     compressedData[i * N + j] = static_cast<UInt16>(std::numeric_limits<UInt16>::max() * ((vec[j] - dMin[j]) / diff[j]));
@@ -93,8 +92,7 @@ void compress(const StdVT<MatXxX<N, RealType>>& dvec, RealType& dMin, RealType& 
 
     compressedData.resize(NN * dvec.size());
     Scheduler::parallel_for(dvec.size(),
-                            [&](size_t i)
-                            {
+                            [&](size_t i) {
                                 MatXxX<N, RealType> mat = dvec[i];
                                 const RealType* mdata   = glm::value_ptr(mat);
                                 for(int j = 0; j < NN; ++j) {
@@ -129,8 +127,7 @@ void compress(const StdVT<RealType>& dvec, RealType& dMin, RealType& dMax, StdVT
 
     compressedData.resize(dvec.size());
     Scheduler::parallel_for(dvec.size(),
-                            [&](size_t i)
-                            {
+                            [&](size_t i) {
                                 compressedData[i] = static_cast<UInt16>(std::numeric_limits<UInt16>::max() * ((dvec[i] - dMin) / diff));
                             });
 }
@@ -200,8 +197,7 @@ void decompress(StdVT_VecX<N, RealType>& dvec, const VecX<N, RealType>& dMin, co
 
     dvec.resize(compressedData.size() / N);
     Scheduler::parallel_for(dvec.size(),
-                            [&](size_t i)
-                            {
+                            [&](size_t i) {
                                 VecX<N, RealType> vec;
                                 for(int j = 0; j < N; ++j) {
                                     vec[j] = static_cast<typename VecX<N, RealType>::value_type>(compressedData[i * N + j]) * diff[j] /
@@ -255,8 +251,7 @@ void decompress(StdVT<MatXxX<N, RealType>>& dvec, RealType dMin, RealType dMax, 
 
     dvec.resize(compressedData.size() / NN);
     Scheduler::parallel_for(dvec.size(),
-                            [&](size_t i)
-                            {
+                            [&](size_t i) {
                                 MatXxX<N, RealType> mat;
                                 RealType* mdata = glm::value_ptr(mat);
 
@@ -306,8 +301,7 @@ void decompress(StdVT<RealType>& dvec, RealType dMin, RealType dMax, const StdVT
 
     dvec.resize(compressedData.size());
     Scheduler::parallel_for(dvec.size(),
-                            [&](size_t i)
-                            {
+                            [&](size_t i) {
                                 dvec[i] = static_cast<RealType>(compressedData[i]) * diff / static_cast<RealType>(std::numeric_limits<UInt16>::max()) + dMin;
                             });
 }
