@@ -1,0 +1,8 @@
+.vs
+.vscode
+**/*.db
+**/*.opendb
+Build/**
+My Advisor Results*
+.DS_Store
+*.DS_Storer
