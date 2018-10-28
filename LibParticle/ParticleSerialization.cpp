@@ -19,8 +19,7 @@
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-void ParticleSerialization::setFixedAttribute(const String& attrName, T value)
-{
+void ParticleSerialization::setFixedAttribute(const String& attrName, T value) {
     __NT_REQUIRE(m_FixedAttributes.find(attrName) != m_FixedAttributes.end());
     auto& attr = m_FixedAttributes[attrName];
     __NT_REQUIRE(sizeof(T) == attr->typeSize());
@@ -30,8 +29,7 @@ void ParticleSerialization::setFixedAttribute(const String& attrName, T value)
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-void ParticleSerialization::setFixedAttribute(const String& attrName, const StdVT<T>& values)
-{
+void ParticleSerialization::setFixedAttribute(const String& attrName, const StdVT<T>& values) {
     __NT_REQUIRE(m_FixedAttributes.find(attrName) != m_FixedAttributes.end());
     auto& attr = m_FixedAttributes[attrName];
     __NT_REQUIRE(values.size() == static_cast<size_t>(attr->count) && sizeof(T) == attr->typeSize());
@@ -41,8 +39,7 @@ void ParticleSerialization::setFixedAttribute(const String& attrName, const StdV
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-void ParticleSerialization::setFixedAttribute(const String& attrName, T* values)
-{
+void ParticleSerialization::setFixedAttribute(const String& attrName, T* values) {
     __NT_REQUIRE(m_FixedAttributes.find(attrName) != m_FixedAttributes.end());
     auto& attr = m_FixedAttributes[attrName];
     attr->buffer.setData((const void*)values, attr->count * attr->typeSize());
@@ -51,8 +48,7 @@ void ParticleSerialization::setFixedAttribute(const String& attrName, T* values)
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-void ParticleSerialization::setFixedAttribute(const String& attrName, const VecX<N, T>& value)
-{
+void ParticleSerialization::setFixedAttribute(const String& attrName, const VecX<N, T>& value) {
     __NT_REQUIRE(m_FixedAttributes.find(attrName) != m_FixedAttributes.end());
     auto& attr = m_FixedAttributes[attrName];
     __NT_REQUIRE(static_cast<UInt>(N) == attr->count && sizeof(T) == attr->typeSize());
@@ -62,8 +58,7 @@ void ParticleSerialization::setFixedAttribute(const String& attrName, const VecX
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-void ParticleSerialization::setFixedAttribute(const String& attrName, const MatXxX<N, T>& value)
-{
+void ParticleSerialization::setFixedAttribute(const String& attrName, const MatXxX<N, T>& value) {
     __NT_REQUIRE(m_FixedAttributes.find(attrName) != m_FixedAttributes.end());
     auto& attr = m_FixedAttributes[attrName];
     __NT_REQUIRE(static_cast<UInt>(N * N) == attr->count && sizeof(T) == attr->typeSize());
@@ -73,24 +68,27 @@ void ParticleSerialization::setFixedAttribute(const String& attrName, const MatX
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-void ParticleSerialization::setParticleAttribute(const String& attrName, const StdVT<T>& values)
-{
+void ParticleSerialization::setParticleAttribute(const String& attrName, const StdVT<T>& values) {
     __NT_REQUIRE(m_ParticleAttributes.find(attrName) != m_ParticleAttributes.end() && values.size() == static_cast<size_t>(m_nParticles));
     auto& attr = m_ParticleAttributes[attrName];
     __NT_REQUIRE(static_cast<UInt>(values.size()) == m_nParticles * attr->count);
-    if(attr->type != TypeCompressedReal) {
+    if constexpr(std::is_floating_point_v<T>) {
+        if(attr->type != TypeCompressedReal) {
+            __NT_REQUIRE(sizeof(T) == attr->typeSize());
+            attr->buffer.setData(values, false);
+        } else {
+            ParticleHelpers::compress(values, attr->buffer, false);
+        }
+    } else {
         __NT_REQUIRE(sizeof(T) == attr->typeSize());
         attr->buffer.setData(values, false);
-    } else {
-        ParticleHelpers::compress(values, attr->buffer, false);
     }
     attr->bReady = true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-void ParticleSerialization::setParticleAttribute(const String& attrName, const StdVT<StdVT<T>>& values)
-{
+void ParticleSerialization::setParticleAttribute(const String& attrName, const StdVT<StdVT<T>>& values) {
     __NT_REQUIRE(m_ParticleAttributes.find(attrName) != m_ParticleAttributes.end() && values.size() == static_cast<size_t>(m_nParticles));
     auto& attr = m_ParticleAttributes[attrName];
     __NT_REQUIRE(attr->type == TypeVectorInt || attr->type == TypeVectorUInt || attr->type == TypeVectorReal);
@@ -102,40 +100,47 @@ void ParticleSerialization::setParticleAttribute(const String& attrName, const S
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-void ParticleSerialization::setParticleAttribute(const String& attrName, const StdVT<VecX<N, T>>& values)
-{
+void ParticleSerialization::setParticleAttribute(const String& attrName, const StdVT<VecX<N, T>>& values) {
     __NT_REQUIRE(m_ParticleAttributes.find(attrName) != m_ParticleAttributes.end() && values.size() == static_cast<size_t>(m_nParticles));
     auto& attr = m_ParticleAttributes[attrName];
     __NT_REQUIRE(static_cast<UInt>(N) == attr->count);
-    if(attr->type != TypeCompressedReal) {
+    if constexpr(std::is_floating_point_v<T>) {
+        if(attr->type != TypeCompressedReal) {
+            __NT_REQUIRE(sizeof(T) == attr->typeSize());
+            attr->buffer.setData(values, false);
+        } else {
+            ParticleHelpers::compress(values, attr->buffer, false);
+        }
+    } else {
         __NT_REQUIRE(sizeof(T) == attr->typeSize());
         attr->buffer.setData(values, false);
-    } else {
-        ParticleHelpers::compress(values, attr->buffer, false);
     }
     attr->bReady = true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-void ParticleSerialization::setParticleAttribute(const String& attrName, const StdVT<MatXxX<N, T>>& values)
-{
+void ParticleSerialization::setParticleAttribute(const String& attrName, const StdVT<MatXxX<N, T>>& values) {
     __NT_REQUIRE(m_ParticleAttributes.find(attrName) != m_ParticleAttributes.end() && values.size() == static_cast<size_t>(m_nParticles));
     auto& attr = m_ParticleAttributes[attrName];
     __NT_REQUIRE(static_cast<UInt>(N * N) == attr->count);
-    if(attr->type != TypeCompressedReal) {
+    if constexpr(std::is_floating_point_v<T>) {
+        if(attr->type != TypeCompressedReal) {
+            __NT_REQUIRE(sizeof(T) == attr->typeSize());
+            attr->buffer.setData((const void*)values.data(), values.size() * sizeof(T) * N * N);
+        } else {
+            ParticleHelpers::compress(values, attr->buffer, false);
+        }
+    } else {
         __NT_REQUIRE(sizeof(T) == attr->typeSize());
         attr->buffer.setData((const void*)values.data(), values.size() * sizeof(T) * N * N);
-    } else {
-        ParticleHelpers::compress(values, attr->buffer, false);
     }
     attr->bReady = true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-bool ParticleSerialization::getFixedAttribute(const String& attrName, T& value)
-{
+bool ParticleSerialization::getFixedAttribute(const String& attrName, T& value) {
     if(m_FixedAttributes.find(attrName) == m_FixedAttributes.end()) {
         return false;
     }
@@ -147,8 +152,7 @@ bool ParticleSerialization::getFixedAttribute(const String& attrName, T& value)
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-bool ParticleSerialization::getFixedAttribute(const String& attrName, T* values)
-{
+bool ParticleSerialization::getFixedAttribute(const String& attrName, T* values) {
     if(m_FixedAttributes.find(attrName) == m_FixedAttributes.end()) {
         return false;
     }
@@ -159,8 +163,7 @@ bool ParticleSerialization::getFixedAttribute(const String& attrName, T* values)
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-bool ParticleSerialization::getFixedAttribute(const String& attrName, StdVT<T>& values)
-{
+bool ParticleSerialization::getFixedAttribute(const String& attrName, StdVT<T>& values) {
     if(m_FixedAttributes.find(attrName) == m_FixedAttributes.end()) {
         return false;
     }
@@ -173,8 +176,7 @@ bool ParticleSerialization::getFixedAttribute(const String& attrName, StdVT<T>& 
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-bool ParticleSerialization::getFixedAttribute(const String& attrName, VecX<N, T>& value)
-{
+bool ParticleSerialization::getFixedAttribute(const String& attrName, VecX<N, T>& value) {
     if(m_FixedAttributes.find(attrName) == m_FixedAttributes.end()) {
         return false;
     }
@@ -186,8 +188,7 @@ bool ParticleSerialization::getFixedAttribute(const String& attrName, VecX<N, T>
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-bool ParticleSerialization::getFixedAttribute(const String& attrName, MatXxX<N, T>& value)
-{
+bool ParticleSerialization::getFixedAttribute(const String& attrName, MatXxX<N, T>& value) {
     if(m_FixedAttributes.find(attrName) == m_FixedAttributes.end()) {
         return false;
     }
@@ -199,124 +200,132 @@ bool ParticleSerialization::getFixedAttribute(const String& attrName, MatXxX<N, 
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-bool ParticleSerialization::getParticleAttribute(const String& attrName, T* values)
-{
+bool ParticleSerialization::getParticleAttribute(const String& attrName, T* values) {
     if(m_ParticleAttributes.find(attrName) == m_ParticleAttributes.end()) {
         return false;
     }
     auto& attr = m_ParticleAttributes[attrName];
-
-    if(attr->type != TypeCompressedReal) {
-        attr->buffer.getData((void*)values, m_nParticles * attr->typeSize() * attr->count);
-    } else {
-        __NT_REQUIRE(sizeof(T) == attr->typeSize());
-        if(attr->count == 1) {
-            StdVT<T> tmp;
-            ParticleHelpers::decompress(tmp, attr->buffer, m_nParticles);
-            memcpy(values, tmp.data(), attr->typeSize() * tmp.size());
+    if constexpr(std::is_floating_point_v<T>) {
+        if(attr->type != TypeCompressedReal) {
+            attr->buffer.getData((void*)values, m_nParticles * attr->typeSize() * attr->count);
         } else {
-            if(attr->count == 2) {
-                StdVT<Vec2<T>> tmp;
+            __NT_REQUIRE(sizeof(T) == attr->typeSize());
+            if(attr->count == 1) {
+                StdVT<T> tmp;
                 ParticleHelpers::decompress(tmp, attr->buffer, m_nParticles);
                 memcpy(values, tmp.data(), attr->typeSize() * tmp.size());
             } else {
-                if(attr->count == 3) {
-                    StdVT<Vec3<T>> tmp;
+                if(attr->count == 2) {
+                    StdVT<Vec2<T>> tmp;
                     ParticleHelpers::decompress(tmp, attr->buffer, m_nParticles);
                     memcpy(values, tmp.data(), attr->typeSize() * tmp.size());
                 } else {
-                    StdVT<Vec4<T>> tmp;
-                    ParticleHelpers::decompress(tmp, attr->buffer, m_nParticles);
-                    memcpy(values, tmp.data(), m_nParticles * attr->typeSize() * attr->count);
+                    if(attr->count == 3) {
+                        StdVT<Vec3<T>> tmp;
+                        ParticleHelpers::decompress(tmp, attr->buffer, m_nParticles);
+                        memcpy(values, tmp.data(), attr->typeSize() * tmp.size());
+                    } else {
+                        StdVT<Vec4<T>> tmp;
+                        ParticleHelpers::decompress(tmp, attr->buffer, m_nParticles);
+                        memcpy(values, tmp.data(), m_nParticles * attr->typeSize() * attr->count);
+                    }
                 }
             }
         }
+    } else {
+        attr->buffer.getData((void*)values, m_nParticles * attr->typeSize() * attr->count);
     }
     return true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-bool ParticleSerialization::getParticleAttribute(const String& attrName, StdVT<T>& values)
-{
+bool ParticleSerialization::getParticleAttribute(const String& attrName, StdVT<T>& values) {
     if(m_ParticleAttributes.find(attrName) == m_ParticleAttributes.end()) {
         return false;
     }
     auto& attr = m_ParticleAttributes[attrName];
     __NT_REQUIRE(sizeof(T) == attr->typeSize());
-
     values.resize(m_nParticles);
-    if(attr->type != TypeCompressedReal) {
-        attr->buffer.getData(values, 0, m_nParticles);
+
+    if constexpr(std::is_floating_point_v<T>) {
+        if(attr->type != TypeCompressedReal) {
+            attr->buffer.getData(values, 0, m_nParticles);
+        } else {
+            ParticleHelpers::decompress(values, attr->buffer, m_nParticles);
+        }
     } else {
-        ParticleHelpers::decompress(values, attr->buffer, m_nParticles);
+        attr->buffer.getData(values, 0, m_nParticles);
     }
     return true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-bool ParticleSerialization::getParticleAttribute(const String& attrName, StdVT<StdVT<T>>& values)
-{
+bool ParticleSerialization::getParticleAttribute(const String& attrName, StdVT<StdVT<T>>& values) {
     if(m_ParticleAttributes.find(attrName) == m_ParticleAttributes.end()) {
         return false;
     }
     auto& attr = m_ParticleAttributes[attrName];
     __NT_REQUIRE(sizeof(T) == attr->typeSize());
-
     values.resize(m_nParticles);
-    if(attr->type != TypeCompressedReal) {
-        attr->buffer.getData(values, 0, m_nParticles);
+    if constexpr(std::is_floating_point_v<T>) {
+        if(attr->type != TypeCompressedReal) {
+            attr->buffer.getData(values, 0, m_nParticles);
+        } else {
+            ParticleHelpers::decompress(values, attr->buffer, m_nParticles);
+        }
     } else {
-        ParticleHelpers::decompress(values, attr->buffer, m_nParticles);
+        attr->buffer.getData(values, 0, m_nParticles);
     }
     return true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-bool ParticleSerialization::getParticleAttribute(const String& attrName, StdVT<VecX<N, T>>& values)
-{
+bool ParticleSerialization::getParticleAttribute(const String& attrName, StdVT<VecX<N, T>>& values) {
     if(m_ParticleAttributes.find(attrName) == m_ParticleAttributes.end()) {
         return false;
     }
     auto& attr = m_ParticleAttributes[attrName];
     __NT_REQUIRE(N == attr->count && sizeof(T) == attr->typeSize());
-
     values.resize(m_nParticles);
-    if(attr->type != TypeCompressedReal) {
-        attr->buffer.getData(values, 0, m_nParticles);
+    if constexpr(std::is_floating_point_v<T>) {
+        if(attr->type != TypeCompressedReal) {
+            attr->buffer.getData(values, 0, m_nParticles);
+        } else {
+            ParticleHelpers::decompress(values, attr->buffer, m_nParticles);
+        }
     } else {
-        ParticleHelpers::decompress(values, attr->buffer, m_nParticles);
+        attr->buffer.getData(values, 0, m_nParticles);
     }
-
     return true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-bool ParticleSerialization::getParticleAttribute(const String& attrName, StdVT<MatXxX<N, T>>& values)
-{
+bool ParticleSerialization::getParticleAttribute(const String& attrName, StdVT<MatXxX<N, T>>& values) {
     if(m_ParticleAttributes.find(attrName) == m_ParticleAttributes.end()) {
         return false;
     }
     auto& attr = m_ParticleAttributes[attrName];
     __NT_REQUIRE(N * N == attr->count && sizeof(T) == attr->typeSize());
-
     values.resize(m_nParticles);
-    if(attr->type != TypeCompressedReal) {
-        attr->buffer.getData((void*)values.data(), m_nParticles * sizeof(T) * N * N);
+    if constexpr(std::is_floating_point_v<T>) {
+        if(attr->type != TypeCompressedReal) {
+            attr->buffer.getData((void*)values.data(), m_nParticles * sizeof(T) * N * N);
+        } else {
+            ParticleHelpers::decompress(values, attr->buffer, m_nParticles);
+        }
     } else {
-        ParticleHelpers::decompress(values, attr->buffer, m_nParticles);
+        attr->buffer.getData((void*)values.data(), m_nParticles * sizeof(T) * N * N);
     }
-
     return true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-bool ParticleSerialization::getParticleAttributeCompressed(const String& attrName, StdVT_UInt16& values, T& dMin, T& dMax)
-{
+bool ParticleSerialization::getParticleAttributeCompressed(const String& attrName, StdVT_UInt16& values, T& dMin, T& dMax) {
     if(m_ParticleAttributes.find(attrName) == m_ParticleAttributes.end()) {
         return false;
     }
@@ -347,8 +356,7 @@ bool ParticleSerialization::getParticleAttributeCompressed(const String& attrNam
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-bool ParticleSerialization::getParticleAttributeCompressed(const String& attrName, StdVT_UInt16& values, VecX<N, T>& dMin, VecX<N, T>& dMax)
-{
+bool ParticleSerialization::getParticleAttributeCompressed(const String& attrName, StdVT_UInt16& values, VecX<N, T>& dMin, VecX<N, T>& dMax) {
     if(m_ParticleAttributes.find(attrName) == m_ParticleAttributes.end()) {
         return false;
     }
@@ -380,8 +388,7 @@ bool ParticleSerialization::getParticleAttributeCompressed(const String& attrNam
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
-bool ParticleSerialization::getParticleAttributeCompressed(const String& attrName, StdVT<StdVT_UInt16>& values, StdVT<T>& dMin, StdVT<T>& dMax)
-{
+bool ParticleSerialization::getParticleAttributeCompressed(const String& attrName, StdVT<StdVT_UInt16>& values, StdVT<T>& dMin, StdVT<T>& dMax) {
     if(m_ParticleAttributes.find(attrName) == m_ParticleAttributes.end()) {
         return false;
     }
@@ -424,8 +431,7 @@ bool ParticleSerialization::getParticleAttributeCompressed(const String& attrNam
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-void ParticleSerialization::saveParticle(const String& fileName, const StdVT<VecX<N, T>>& positions, T particleRadius, bool bCompress /*= true*/)
-{
+void ParticleSerialization::saveParticle(const String& fileName, const StdVT<VecX<N, T>>& positions, T particleRadius, bool bCompress /*= true*/) {
     ParticleSerialization particleWriter;
     particleWriter.addFixedAttribute<T>("particle_radius", ParticleSerialization::TypeReal, 1);
     if(bCompress) {
@@ -441,8 +447,7 @@ void ParticleSerialization::saveParticle(const String& fileName, const StdVT<Vec
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class T>
-bool ParticleSerialization::loadParticle(const String& fileName, StdVT<VecX<N, T>>& positions, T& particleRadius)
-{
+bool ParticleSerialization::loadParticle(const String& fileName, StdVT<VecX<N, T>>& positions, T& particleRadius) {
     ParticleSerialization particleReader;
     if(!particleReader.read(fileName)) {
         return false;
@@ -465,8 +470,7 @@ bool ParticleSerialization::loadParticle(const String& fileName, StdVT<VecX<N, T
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 // non-template functions
-String ParticleSerialization::Attribute::typeName()
-{
+String ParticleSerialization::Attribute::typeName() {
     switch(type) {
         case TypeChar:
             return String("char");
@@ -498,14 +502,12 @@ String ParticleSerialization::Attribute::typeName()
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-size_t ParticleSerialization::Attribute::typeSize()
-{
+size_t ParticleSerialization::Attribute::typeSize() {
     return static_cast<size_t>(size);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void ParticleSerialization::clearData()
-{
+void ParticleSerialization::clearData() {
     m_nParticles = 0;
 
     for(auto& attr : m_FixedAttributes) {
@@ -519,16 +521,14 @@ void ParticleSerialization::clearData()
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void ParticleSerialization::flushAsync(Int fileID)
-{
+void ParticleSerialization::flushAsync(Int fileID) {
     __NT_REQUIRE(m_DataIO != nullptr);
     m_DataIO->createOutputFolders();
     flushAsync(m_DataIO->getFilePath(fileID));
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void ParticleSerialization::flushAsync(const String& fileName)
-{
+void ParticleSerialization::flushAsync(const String& fileName) {
     __NT_REQUIRE(m_nParticles > 0 && m_FixedAttributes.size() > 0);
     if(m_Logger != nullptr) {
         buildAttrNameList();
@@ -540,8 +540,7 @@ void ParticleSerialization::flushAsync(const String& fileName)
     }
 
     waitForBuffers();
-    m_WriteFutureObj = std::async(std::launch::async, [&, fileName]()
-                                  {
+    m_WriteFutureObj = std::async(std::launch::async, [&, fileName]() {
                                       std::ofstream opf(fileName, std::ios::binary | std::ios::out);
                                       if(!opf.is_open()) {
                                           if(m_Logger != nullptr) {
@@ -565,8 +564,7 @@ void ParticleSerialization::flushAsync(const String& fileName)
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-size_t ParticleSerialization::computeBufferSize()
-{
+size_t ParticleSerialization::computeBufferSize() {
     size_t totalSize = 0;
     for(auto& kv : m_FixedAttributes) {
         totalSize += kv.second->buffer.size();
@@ -579,8 +577,7 @@ size_t ParticleSerialization::computeBufferSize()
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void ParticleSerialization::buildAttrNameList()
-{
+void ParticleSerialization::buildAttrNameList() {
     if(m_AttributeNameList.empty()) {
         for(auto& kv : m_FixedAttributes) {
             __NT_REQUIRE_MSG(kv.second->bReady, kv.first + String(" attribute is not set!"));
@@ -598,8 +595,7 @@ void ParticleSerialization::buildAttrNameList()
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void ParticleSerialization::writeHeader(std::ofstream& opf)
-{
+void ParticleSerialization::writeHeader(std::ofstream& opf) {
     const std::locale& fixLoc = std::locale("C");
     opf.imbue(fixLoc);
 
@@ -621,16 +617,14 @@ void ParticleSerialization::writeHeader(std::ofstream& opf)
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-bool ParticleSerialization::read(Int fileID, const StdVT<String>& readAttributes /*= {}*/, bool bStopIfFailed /*= true*/)
-{
+bool ParticleSerialization::read(Int fileID, const StdVT<String>& readAttributes /*= {}*/, bool bStopIfFailed /*= true*/) {
     __NT_REQUIRE(m_DataIO != nullptr);
     const String fileName = m_DataIO->getFilePath(fileID);
     return read(fileName, readAttributes, bStopIfFailed);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-bool ParticleSerialization::read(const String& fileName, const StdVT<String>& readAttributes /*= {}*/, bool bStopIfFailed /*= true*/)
-{
+bool ParticleSerialization::read(const String& fileName, const StdVT<String>& readAttributes /*= {}*/, bool bStopIfFailed /*= true*/) {
     std::ifstream ipf(fileName, std::ios::binary | std::ios::in);
     if(!ipf.is_open()) {
         if(m_Logger != nullptr) {
@@ -696,16 +690,14 @@ bool ParticleSerialization::read(const String& fileName, const StdVT<String>& re
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-bool ParticleSerialization::readHeader(Int fileID, const StdVT<String>& readAttributes /*= {}*/, bool bStopIfFailed /*= true*/)
-{
+bool ParticleSerialization::readHeader(Int fileID, const StdVT<String>& readAttributes /*= {}*/, bool bStopIfFailed /*= true*/) {
     __NT_REQUIRE(m_DataIO != nullptr);
     const String fileName = m_DataIO->getFilePath(fileID);
     return readHeader(fileName, readAttributes, bStopIfFailed);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-bool ParticleSerialization::readHeader(const String& fileName, const StdVT<String>& readAttributes /*= {}*/, bool bStopIfFailed /*= true*/)
-{
+bool ParticleSerialization::readHeader(const String& fileName, const StdVT<String>& readAttributes /*= {}*/, bool bStopIfFailed /*= true*/) {
     std::ifstream ipf(fileName, std::ios::binary | std::ios::in);
     if(!ipf.is_open()) {
         if(m_Logger != nullptr) {
@@ -727,13 +719,11 @@ bool ParticleSerialization::readHeader(const String& fileName, const StdVT<Strin
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-bool ParticleSerialization::readHeader(std::ifstream& ipf)
-{
+bool ParticleSerialization::readHeader(std::ifstream& ipf) {
     String line;
     bool   gotMagic = false;
 
-    auto getType = [&](const String& typeName) -> DataType
-                   {
+    auto getType = [&](const String& typeName) -> DataType {
                        if(typeName == "char") {
                            return TypeChar;
                        }
@@ -805,8 +795,7 @@ bool ParticleSerialization::readHeader(std::ifstream& ipf)
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-bool ParticleSerialization::readAttribute(SharedPtr<Attribute>& attr, std::ifstream& ipf, size_t cursor)
-{
+bool ParticleSerialization::readAttribute(SharedPtr<Attribute>& attr, std::ifstream& ipf, size_t cursor) {
     if(m_ReadAttributeDataSizeMap.find(attr->name) == m_ReadAttributeDataSizeMap.end()) {
         return false;
     }
