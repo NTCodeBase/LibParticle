@@ -45,6 +45,8 @@ VecX<N, Real_t> getCenter(const StdVT_VecX<N, Real_t>& positions) {
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t>
 void compress(const StdVT_VecX<N, Real_t>& dvec, VecX<N, Real_t>& dMin, VecX<N, Real_t>& dMax, StdVT_UInt16& compressedData) {
+    static_assert(std::is_floating_point_v<Real_t>);
+    ////////////////////////////////////////////////////////////////////////////////
     ParallelSTL::min_max<N, Real_t>(dvec, dMin, dMax);
     auto diff = dMax - dMin;
     ////////////////////////////////////////////////////////////////////////////////
@@ -68,6 +70,8 @@ void compress(const StdVT_VecX<N, Real_t>& dvec, VecX<N, Real_t>& dMin, VecX<N, 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t>
 void compress(const StdVT_VecX<N, Real_t>& dvec, DataBuffer& buffer, bool bWriteVectorSize /*= true*/) {
+    static_assert(std::is_floating_point_v<Real_t>);
+    ////////////////////////////////////////////////////////////////////////////////
     VecX<N, Real_t> dMin, dMax;
     StdVT_UInt16    compressedData;
     compress(dvec, dMin, dMax, compressedData);
@@ -89,6 +93,8 @@ void compress(const StdVT_VecX<N, Real_t>& dvec, DataBuffer& buffer, bool bWrite
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t>
 void compress(const StdVT<MatXxX<N, Real_t>>& dvec, Real_t& dMin, Real_t& dMax, StdVT_UInt16& compressedData) {
+    static_assert(std::is_floating_point_v<Real_t>);
+    ////////////////////////////////////////////////////////////////////////////////
     Int NN = N * N;
     ParallelSTL::min_max<N, Real_t>(dvec, dMin, dMax);
     const Real_t diff = dMax - dMin;
@@ -107,6 +113,8 @@ void compress(const StdVT<MatXxX<N, Real_t>>& dvec, Real_t& dMin, Real_t& dMax, 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t>
 void compress(const StdVT<MatXxX<N, Real_t>>& dvec, DataBuffer& buffer, bool bWriteVectorSize /*= true*/) {
+    static_assert(std::is_floating_point_v<Real_t>);
+    ////////////////////////////////////////////////////////////////////////////////
     Real_t       dMin, dMax;
     StdVT_UInt16 compressedData;
     compress(dvec, dMin, dMax, compressedData);
@@ -123,6 +131,8 @@ void compress(const StdVT<MatXxX<N, Real_t>>& dvec, DataBuffer& buffer, bool bWr
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class Real_t>
 void compress(const StdVT<Real_t>& dvec, Real_t& dMin, Real_t& dMax, StdVT_UInt16& compressedData) {
+    static_assert(std::is_floating_point_v<Real_t>);
+    ////////////////////////////////////////////////////////////////////////////////
     ParallelSTL::min_max<Real_t>(dvec, dMin, dMax);
     const Real_t diff = dMax - dMin;
 
@@ -136,6 +146,8 @@ void compress(const StdVT<Real_t>& dvec, Real_t& dMin, Real_t& dMax, StdVT_UInt1
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class Real_t>
 void compress(const StdVT<Real_t>& dvec, DataBuffer& buffer, bool bWriteVectorSize /*= true*/) {
+    static_assert(std::is_floating_point_v<Real_t>);
+    ////////////////////////////////////////////////////////////////////////////////
     Real_t       dMin, dMax;
     StdVT_UInt16 compressedData;
     compress(dvec, dMin, dMax, compressedData);
@@ -153,8 +165,9 @@ void compress(const StdVT<Real_t>& dvec, DataBuffer& buffer, bool bWriteVectorSi
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class Real_t>
 void compress(const StdVT<StdVT<Real_t>>& dvec, StdVT<Real_t>& dMin, StdVT<Real_t>& dMax, StdVT<StdVT_UInt16>& compressedData) {
+    static_assert(std::is_floating_point_v<Real_t>);
     __NT_REQUIRE(dvec.size() == dMin.size() && dvec.size() == dMax.size());
-
+    ////////////////////////////////////////////////////////////////////////////////
     compressedData.resize(dvec.size());
     Scheduler::parallel_for(dvec.size(), [&](size_t i) { compress(dvec[i], dMin[i], dMax[i], compressedData[i]); });
 }
@@ -162,6 +175,7 @@ void compress(const StdVT<StdVT<Real_t>>& dvec, StdVT<Real_t>& dMin, StdVT<Real_
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class Real_t>
 void compress(const StdVT<StdVT<Real_t>>& dvec, DataBuffer& buffer, bool bWriteVectorSize /*= true*/) {
+    static_assert(std::is_floating_point_v<Real_t>);
     StdVT<Real_t>       dMin, dMax;
     StdVT<StdVT_UInt16> compressedData;
     compress(dvec, dMin, dMax, compressedData);
@@ -189,6 +203,7 @@ void compress(const StdVT<StdVT<Real_t>>& dvec, DataBuffer& buffer, bool bWriteV
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t>
 void decompress(StdVT_VecX<N, Real_t>& dvec, const VecX<N, Real_t>& dMin, const VecX<N, Real_t>& dMax, const StdVT_UInt16& compressedData) {
+    static_assert(std::is_floating_point_v<Real_t>);
     const VecX<N, Real_t> diff = dMax - dMin;
     __NT_REQUIRE((compressedData.size() / N) * N == compressedData.size());
 
@@ -207,6 +222,7 @@ void decompress(StdVT_VecX<N, Real_t>& dvec, const VecX<N, Real_t>& dMin, const 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t>
 void decompress(StdVT_VecX<N, Real_t>& dvec, const DataBuffer& buffer, UInt nParticles /*= 0*/) {
+    static_assert(std::is_floating_point_v<Real_t>);
     VecX<N, float> dMinf, dMaxf;
 
     UInt64 segmentStart = 0;
@@ -240,6 +256,7 @@ void decompress(StdVT_VecX<N, Real_t>& dvec, const DataBuffer& buffer, UInt nPar
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t>
 void decompress(StdVT<MatXxX<N, Real_t>>& dvec, Real_t dMin, Real_t dMax, const StdVT_UInt16& compressedData) {
+    static_assert(std::is_floating_point_v<Real_t>);
     Int          NN   = N * N;
     const Real_t diff = dMax - dMin;
     __NT_REQUIRE((compressedData.size() / NN) * NN == compressedData.size());
@@ -261,6 +278,7 @@ void decompress(StdVT<MatXxX<N, Real_t>>& dvec, Real_t dMin, Real_t dMax, const 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t>
 void decompress(StdVT<MatXxX<N, Real_t>>& dvec, const DataBuffer& buffer, UInt nParticles /*= 0*/) {
+    static_assert(std::is_floating_point_v<Real_t>);
     float  dMinf, dMaxf;
     UInt64 segmentStart = 0;
     UInt64 segmentSize;
@@ -290,8 +308,8 @@ void decompress(StdVT<MatXxX<N, Real_t>>& dvec, const DataBuffer& buffer, UInt n
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class Real_t>
 void decompress(StdVT<Real_t>& dvec, Real_t dMin, Real_t dMax, const StdVT_UInt16& compressedData) {
+    static_assert(std::is_floating_point_v<Real_t>);
     const Real_t diff = dMax - dMin;
-
     dvec.resize(compressedData.size());
     Scheduler::parallel_for(dvec.size(),
                             [&](size_t i) {
@@ -302,6 +320,7 @@ void decompress(StdVT<Real_t>& dvec, Real_t dMin, Real_t dMax, const StdVT_UInt1
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class Real_t>
 void decompress(StdVT<Real_t>& dvec, const DataBuffer& buffer, UInt nParticles /*= 0*/) {
+    static_assert(std::is_floating_point_v<Real_t>);
     float  dMinf, dMaxf;
     UInt64 segmentStart = 0;
     UInt64 segmentSize;
@@ -331,6 +350,7 @@ void decompress(StdVT<Real_t>& dvec, const DataBuffer& buffer, UInt nParticles /
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class Real_t>
 void decompress(StdVT<StdVT<Real_t>>& dvec, const StdVT<Real_t>& dMin, const StdVT<Real_t>& dMax, const StdVT<StdVT_UInt16>& compressedData) {
+    static_assert(std::is_floating_point_v<Real_t>);
     __NT_REQUIRE(compressedData.size() == dMin.size() && compressedData.size() == dMax.size());
 
     dvec.resize(compressedData.size());
@@ -340,6 +360,7 @@ void decompress(StdVT<StdVT<Real_t>>& dvec, const StdVT<Real_t>& dMin, const Std
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class Real_t>
 void decompress(StdVT<StdVT<Real_t>>& dvec, const DataBuffer& buffer, UInt nParticles /*= 0*/) {
+    static_assert(std::is_floating_point_v<Real_t>);
     StdVT<float> dMinf, dMaxf;
 
     UInt64 segmentStart = 0;
@@ -622,7 +643,6 @@ __BNN_INSTANTIATE_GET_AABB_COMMON_VEC_DIM(double)
 
 __BNN_INSTANTIATE_GET_CENTER_COMMON_VEC_DIM(float)
 __BNN_INSTANTIATE_GET_CENTER_COMMON_VEC_DIM(double)
-
 ////////////////////////////////////////////////////////////////////////////////
 #define __BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(type)                                                                                     \
     template void compress<2, type>(const StdVT_VecX<2, type>&dvec, VecX<2, type>&dMin, VecX<2, type>&dMax, StdVT_UInt16 & compressedData); \
@@ -640,12 +660,6 @@ __BNN_INSTANTIATE_GET_CENTER_COMMON_VEC_DIM(double)
 
 __BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(float)
 __BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(double)
-__BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(Int)
-__BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(UInt)
-__BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(Int16)
-__BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(UInt16)
-__BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(Int64)
-__BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(UInt64)
 ////////////////////////////////////////////////////////////////////////////////
 #define __BNN_INSTANTIATE_COMPRESS(type)                                                                                                 \
     template void compress<type>(const StdVT<type>&dvec, DataBuffer & buffer, bool bWriteVectorSize /*= true*/);                         \
@@ -655,13 +669,6 @@ __BNN_INSTANTIATE_COMPRESS_COMMON_VEC_DIM(UInt64)
 
 __BNN_INSTANTIATE_COMPRESS(float)
 __BNN_INSTANTIATE_COMPRESS(double)
-__BNN_INSTANTIATE_COMPRESS(Int)
-__BNN_INSTANTIATE_COMPRESS(UInt)
-__BNN_INSTANTIATE_COMPRESS(Int16)
-__BNN_INSTANTIATE_COMPRESS(UInt16)
-__BNN_INSTANTIATE_COMPRESS(Int64)
-__BNN_INSTANTIATE_COMPRESS(UInt64)
-
 ////////////////////////////////////////////////////////////////////////////////
 #define __BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(type)                                                                                                \
     template void decompress<2, type>(StdVT_VecX<2, type>&dvec, const VecX<2, type>&dMin, const VecX<2, type>&dMax, const StdVT_UInt16& compressedData); \
@@ -679,12 +686,6 @@ __BNN_INSTANTIATE_COMPRESS(UInt64)
 
 __BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(float)
 __BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(double)
-__BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(Int)
-__BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(UInt)
-__BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(Int16)
-__BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(UInt16)
-__BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(Int64)
-__BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(UInt64)
 ////////////////////////////////////////////////////////////////////////////////
 #define __BNN_INSTANTIATE_DECOMPRESS(type)                                                                                                             \
     template void decompress<type>(StdVT<type>&dvec, type dMin, type dMax, const StdVT_UInt16& compressedData);                                        \
@@ -694,13 +695,6 @@ __BNN_INSTANTIATE_DECOMPRESS_COMMON_VEC_DIM(UInt64)
 
 __BNN_INSTANTIATE_DECOMPRESS(float)
 __BNN_INSTANTIATE_DECOMPRESS(double)
-__BNN_INSTANTIATE_DECOMPRESS(Int)
-__BNN_INSTANTIATE_DECOMPRESS(UInt)
-__BNN_INSTANTIATE_DECOMPRESS(Int16)
-__BNN_INSTANTIATE_DECOMPRESS(UInt16)
-__BNN_INSTANTIATE_DECOMPRESS(Int64)
-__BNN_INSTANTIATE_DECOMPRESS(UInt64)
-
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 #define __BNN_INSTANTIATE_LOAD_SAVE_PARTICLES(N, type)                                                                            \
     template bool loadParticlesFromObj<N, type>(const String& fileName, StdVT_VecX<N, type>&positions);                           \
