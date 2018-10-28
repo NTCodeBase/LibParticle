@@ -17,14 +17,10 @@
 #include <LibCommon/Data/DataIO.h>
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-namespace ParticleHelpers
-{
+namespace ParticleHelpers {
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-// template functions are defined in a hpp file
-
 template<Int N, class Real_t> std::pair<VecX<N, Real_t>, VecX<N, Real_t>> getAABB(const StdVT_VecX<N, Real_t>& positions);
-template<Int N, class Real_t> VecX<N, Real_t>                               getCenter(const StdVT_VecX<N, Real_t>& positions);
+template<Int N, class Real_t> VecX<N, Real_t>                             getCenter(const StdVT_VecX<N, Real_t>& positions);
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<Int N, class Real_t> void compress(const StdVT_VecX<N, Real_t>& dvec, VecX<N, Real_t>& dMin, VecX<N, Real_t>& dMax, StdVT_UInt16& compressedData);
@@ -64,4 +60,4 @@ void connectedComponentAnalysis(const StdVT<StdVT_UInt>& connectionList, StdVT_I
 UInt spawnComponent(UInt p, Int depth, UInt8 currentIdx, const StdVT<StdVT_UInt>& connectionList, StdVT_Int8& componentIdx);
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-}   // end namespace ParticleHelpers
+} // end namespace ParticleHelpers
