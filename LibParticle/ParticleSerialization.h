@@ -37,11 +37,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // =====> Banana Particle Data format
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-class ParticleSerialization
-{
+class ParticleSerialization {
 public:
-    enum DataType
-    {
+    enum DataType {
         TypeChar,
         TypeUInt16,
         TypeInt,
@@ -55,16 +53,14 @@ public:
         TypeVectorCompressedReal
     };
 
-    enum ElementSize
-    {
+    enum ElementSize {
         Size8b  = sizeof(char),
         Size16b = sizeof(UInt16),
         Size32b = sizeof(float),
         Size64b = sizeof(double)
     };
 
-    struct Attribute
-    {
+    struct Attribute {
         DataBuffer  buffer;
         String      name;
         DataType    type;
@@ -91,33 +87,28 @@ public:
 
     void setDataPath(const String& dataRootFolder,
                      const String& dataFolder,
-                     const String& fileName)
-    {
+                     const String& fileName) {
         m_DataIO = std::make_shared<DataIO>(dataRootFolder, dataFolder, fileName, String("bnn"), String("BananaParticleData"));
     }
 
     ////////////////////////////////////////////////////////////////////////////////
     // functions for writing data
     template<class T>
-    void addFixedAttribute(const String& attrName, DataType type, UInt count = 1)
-    {
+    void addFixedAttribute(const String& attrName, DataType type, UInt count = 1) {
         addFixedAttribute(attrName, type, static_cast<ParticleSerialization::ElementSize>(sizeof(T)), count);
     }
 
     template<class T>
-    void addParticleAttribute(const String& attrName, DataType type, UInt count = 1)
-    {
+    void addParticleAttribute(const String& attrName, DataType type, UInt count = 1) {
         addParticleAttribute(attrName, type, static_cast<ParticleSerialization::ElementSize>(sizeof(T)), count);
     }
 
-    void addFixedAttribute(const String& attrName, DataType type, ElementSize size, UInt count = 1)
-    {
+    void addFixedAttribute(const String& attrName, DataType type, ElementSize size, UInt count = 1) {
         __NT_REQUIRE(type == TypeChar || type == TypeInt || type == TypeUInt || type == TypeReal);
         m_FixedAttributes[attrName] = std::make_shared<Attribute>(attrName, type, size, count);
     }
 
-    void addParticleAttribute(const String& attrName, DataType type, ElementSize size, UInt count = 1)
-    {
+    void addParticleAttribute(const String& attrName, DataType type, ElementSize size, UInt count = 1) {
         m_ParticleAttributes[attrName] = std::make_shared<Attribute>(attrName, type, size, count);
     }
 
