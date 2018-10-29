@@ -52,7 +52,7 @@ void compress(const StdVT_VecX<N, Real_t>& dvec, VecX<N, Real_t>& dMin, VecX<N, 
     ////////////////////////////////////////////////////////////////////////////////
     // check if any dimension having the same value
     for(int j = 0; j < N; ++j) {
-        if(std::abs(diff[j]) < Tiny<Real_t>()) {
+        if(std::abs(diff[j]) < Real_t(1e-20)) {
             diff[j] = Real_t(1); // to avoid divide by zero, setting to 1 is just fine
         }
     }
@@ -97,8 +97,13 @@ void compress(const StdVT<MatXxX<N, Real_t>>& dvec, Real_t& dMin, Real_t& dMax, 
     ////////////////////////////////////////////////////////////////////////////////
     Int NN = N * N;
     ParallelSTL::min_max<N, Real_t>(dvec, dMin, dMax);
-    const Real_t diff = dMax - dMin;
-
+    Real_t diff = dMax - dMin;
+    ////////////////////////////////////////////////////////////////////////////////
+    // check if any dimension having the same value
+    if(std::abs(diff) < Real_t(1e-20)) {
+        diff = Real_t(1); // to avoid divide by zero, setting to 1 is just fine
+    }
+    ////////////////////////////////////////////////////////////////////////////////
     compressedData.resize(NN * dvec.size());
     Scheduler::parallel_for(dvec.size(),
                             [&](size_t i) {
@@ -134,8 +139,13 @@ void compress(const StdVT<Real_t>& dvec, Real_t& dMin, Real_t& dMax, StdVT_UInt1
     static_assert(std::is_floating_point_v<Real_t>);
     ////////////////////////////////////////////////////////////////////////////////
     ParallelSTL::min_max<Real_t>(dvec, dMin, dMax);
-    const Real_t diff = dMax - dMin;
-
+    Real_t diff = dMax - dMin;
+    ////////////////////////////////////////////////////////////////////////////////
+    // check if any dimension having the same value
+    if(std::abs(diff) < Real_t(1e-20)) {
+        diff = Real_t(1); // to avoid divide by zero, setting to 1 is just fine
+    }
+    ////////////////////////////////////////////////////////////////////////////////
     compressedData.resize(dvec.size());
     Scheduler::parallel_for(dvec.size(),
                             [&](size_t i) {
@@ -206,7 +216,6 @@ void decompress(StdVT_VecX<N, Real_t>& dvec, const VecX<N, Real_t>& dMin, const 
     static_assert(std::is_floating_point_v<Real_t>);
     const VecX<N, Real_t> diff = dMax - dMin;
     __NT_REQUIRE((compressedData.size() / N) * N == compressedData.size());
-
     dvec.resize(compressedData.size() / N);
     Scheduler::parallel_for(dvec.size(),
                             [&](size_t i) {
