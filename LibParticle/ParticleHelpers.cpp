@@ -435,24 +435,26 @@ template<Int N, class Real_t> bool loadParticlesFromObj(const String& fileName, 
 
 template<Int N, class Real_t> bool loadParticlesFromBGEO(const String& fileName, StdVT_VecX<N, Real_t>& positions, Real_t& particleRadius) {
     Partio::ParticlesDataMutable* bgeoParticles = Partio::read(fileName.c_str());
-    Partio::ParticleAttribute     attrRadius, attrPosition;
     if(bgeoParticles == nullptr) { return false; }
-    if(!bgeoParticles->attributeInfo("pscale", attrRadius)) { return false; }
-    if(!bgeoParticles->attributeInfo("position", attrPosition)) { return false; }
-
-    const float* radius = bgeoParticles->data<float>(attrRadius, 0);
-    if(particleRadius == 0) {
-        particleRadius = static_cast<Real_t>(radius[0]);
-    } else {
-        __NT_REQUIRE(std::abs(particleRadius - radius[0]) < MEpsilon<Real_t>());
+    Partio::ParticleAttribute attrPosition;
+    if(!bgeoParticles->attributeInfo("position", attrPosition)) {
+        return false;
     }
+    ////////////////////////////////////////////////////////////////////////////////
+    if(Partio::ParticleAttribute attrRadius; bgeoParticles->attributeInfo("pscale", attrRadius)) {
+        const float* radius = bgeoParticles->data<float>(attrRadius, 0);
+        if(std::abs(particleRadius) < Real_t(1e-10)) {
+            particleRadius = static_cast<Real_t>(radius[0]);
+        } else {
+            __NT_REQUIRE(std::abs(particleRadius - radius[0]) < MEpsilon<Real_t>());
+        }
+    }
+    positions.resize(bgeoParticles->numParticles());
     auto* positionsPtr = reinterpret_cast<Real_t*>(positions.data());
     for(int p = 0; p < bgeoParticles->numParticles(); ++p) {
         const float* pos = bgeoParticles->data<float>(attrPosition, p);
-        positionsPtr[p * N]     = static_cast<Real_t>(pos[0]);
-        positionsPtr[p * N + 1] = static_cast<Real_t>(pos[1]);
-        if constexpr(N == 3) {
-            positionsPtr[p * N + 2] = static_cast<Real_t>(pos[2]);
+        for(int i = 0; i < N; ++i) {
+            positionsPtr[p * N + i] = static_cast<Real_t>(pos[i]);
         }
     }
     bgeoParticles->release();
