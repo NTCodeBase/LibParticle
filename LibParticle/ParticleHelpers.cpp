@@ -419,6 +419,9 @@ template<Int N, class Real_t> bool loadParticlesFromObj(const String& fileName, 
         std::istringstream ls(line);
         String             label;
         ls >> label;
+        if(label != "v") {
+            continue;
+        }
         if constexpr(N == 2) {
             Vec2f v;
             ls >> v.x >> v.y;
