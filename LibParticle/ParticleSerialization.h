@@ -145,7 +145,7 @@ public:
     bool readHeader(Int fileID, const StdVT<String>& readAttributes             = {}, bool bStopIfFailed = true);
     bool readHeader(const String& fileName, const StdVT<String>& readAttributes = {}, bool bStopIfFailed = true);
     size_t getBytesRead() const { return m_ByteRead; }
-    UInt   getNParticles() const { return m_nParticles; }
+    UInt   nParticles() const { return m_nParticles; }
 
     bool hasFixedAttribute(const String& attrName) const { return m_FixedAttributes.find(attrName) != m_FixedAttributes.end(); }
     bool hasParticleAttribute(const String& attrName) const { return m_ParticleAttributes.find(attrName) != m_ParticleAttributes.end(); }
