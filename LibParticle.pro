@@ -21,6 +21,7 @@ CONFIG += staticlib
 
 HEADERS = $$files($$PWD/LibParticle/*.h, true)
 SOURCES += $$files($$PWD/LibParticle/*.cpp, true)
+OTHER_FILES += Makefile
 
 #-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 CONFIG(debug, debug|release) {
