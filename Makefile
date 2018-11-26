@@ -1,7 +1,10 @@
 ################################################################################
-COMPILER := g++-8
-ALL_CCFLAGS := -W -O3 -flto -lstdc++fs
+GCC_PREFIX  ?=
+GCC_SUFFIX  ?=
+COMPILER    := $(GCC_PREFIX)g++$(GCC_SUFFIX)
+ALL_CCFLAGS := -g -W -O3 -lstdc++fs
 ALL_CCFLAGS += -std=c++17
+ALL_CCFLAGS += $(FLAG_FLTO)
 
 ################################################################################
 ROOT_PATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -11,6 +14,7 @@ INCLUDES += -I$(ROOT_PATH)/../LibCommon
 INCLUDES += -I$(ROOT_PATH)/../LibCommon/Externals/glm
 INCLUDES += -I$(ROOT_PATH)/../LibCommon/Externals/json/single_include/nlohmann
 INCLUDES += -I$(ROOT_PATH)/../LibCommon/Externals/spdlog/include
+INCLUDES += -I$(ROOT_PATH)/../LibCommon/Externals/tbb_linux/include
 
 ################################################################################
 OUTPUT_DIR := ../../Build/Linux
@@ -24,16 +28,17 @@ COMPILE_OBJ_SUBDIR  := $(patsubst $(ROOT_PATH)/%, $(OBJ_DIR)/%, $(dir $(LIB_OBJ)
 
 ################################################################################
 all: create_out_dir $(COMPILE_OBJ)
-	ar -rsv $(OUTPUT_DIR)/$(LIB_NAME) $(COMPILE_OBJ)
-	ranlib $(OUTPUT_DIR)/$(LIB_NAME)
+	$(GCC_PREFIX)gcc-ar$(GCC_SUFFIX) -rsv $(OUTPUT_DIR)/$(LIB_NAME) $(COMPILE_OBJ)
+	$(GCC_PREFIX)gcc-ranlib$(GCC_SUFFIX) $(OUTPUT_DIR)/$(LIB_NAME)
 
 create_out_dir:
 	mkdir -p $(OUTPUT_DIR)
 	mkdir -p $(OBJ_DIR)
 	mkdir -p $(COMPILE_OBJ_SUBDIR)
 
-$(COMPILE_OBJ): %.o: $(patsubst $(OBJ_DIR)/%, $(ROOT_PATH)/%, $(patsubst %.o, %.cpp, $(COMPILE_OBJ)))
+$(COMPILE_OBJ): $(OBJ_DIR)/%.o: $(ROOT_PATH)/%.cpp
 	$(COMPILER) $(INCLUDES) $(ALL_CCFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OUTPUT_DIR)/LibParticle/*
+	rm -rf $(OBJ_DIR)/LibParticle
+	rm $(OUTPUT_DIR)/$(LIB_NAME)
