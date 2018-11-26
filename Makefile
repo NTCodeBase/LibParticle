@@ -1,7 +1,9 @@
 ################################################################################
-GCC_PREFIX  ?=
-GCC_SUFFIX  ?=
-COMPILER    := $(GCC_PREFIX)g++$(GCC_SUFFIX)
+COMPILER_PREFIX ?=
+COMPILER_SUFFIX ?=
+COMPILER_NAME   ?= g++
+
+COMPILER    := $(COMPILER_PREFIX)$(COMPILER_NAME)$(COMPILER_SUFFIX)
 ALL_CCFLAGS := -g -W -O3 -lstdc++fs
 ALL_CCFLAGS += -std=c++17
 ALL_CCFLAGS += $(FLAG_FLTO)
