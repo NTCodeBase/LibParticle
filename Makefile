@@ -4,9 +4,7 @@ COMPILER_SUFFIX ?=
 COMPILER_NAME   ?= g++
 
 COMPILER    := $(COMPILER_PREFIX)$(COMPILER_NAME)$(COMPILER_SUFFIX)
-ALL_CCFLAGS := -g -W -O3 -lstdc++fs
-ALL_CCFLAGS += -std=c++17
-ALL_CCFLAGS += $(FLAG_FLTO)
+ALL_CCFLAGS ?= -g -W -O3 -lstdc++fs -DNDEBUG -std=c++17 $(FLAG_FLTO)
 
 ################################################################################
 ROOT_PATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
