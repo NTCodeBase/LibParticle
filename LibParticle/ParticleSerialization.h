@@ -19,6 +19,8 @@
 #include <LibCommon/Logger/Logger.h>
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+namespace NTCodeBase {
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 // Banana Particle Data format =====>
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -175,10 +177,10 @@ private:
     bool   readHeader(std::ifstream& ipf);
     bool   readAttribute(SharedPtr<Attribute>& attr, std::ifstream& ipf, size_t cursor);
 
-    UInt                              m_nParticles;
+    UInt m_nParticles;
     Map<String, SharedPtr<Attribute>> m_FixedAttributes;
     Map<String, SharedPtr<Attribute>> m_ParticleAttributes;
-    String                            m_AttributeNameList;
+    String m_AttributeNameList;
 
     Map<String, size_t> m_ReadAttributeDataSizeMap;
     Map<String, bool>   m_bReadAttributeMap;
@@ -192,3 +194,5 @@ public:
     template<Int N, class T> static void saveParticle(const String& fileName, const StdVT<VecX<N, T>>& positions, T particleRadius, bool bCompress = true);
     template<Int N, class T> static bool loadParticle(const String& fileName, StdVT<VecX<N, T>>& positions, T& particleRadius);
 };
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+} // end namespace NTCodeBase

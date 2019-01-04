@@ -19,6 +19,8 @@
 #include <algorithm>
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+namespace NTCodeBase {
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 template<class T>
 void ParticleSerialization::setFixedAttribute(const String& attrName, T value) {
     __NT_REQUIRE(m_FixedAttributes.find(attrName) != m_FixedAttributes.end());
@@ -715,7 +717,7 @@ bool ParticleSerialization::readHeader(const String& fileName, const StdVT<Strin
     if(!readHeader(ipf)) {
         return false;
     }
-
+    //todo: this function is not complte
     return true;
 }
 
@@ -951,3 +953,4 @@ __BNN_INSTANTIATE_GET_PARTICLE_ATTRIBUTE_COMMON_VEC_DIM(UInt64)
 //template bool ParticleSerialization::getParticleAttributeCompressed(const String& attrName, StdVT<StdVT_UInt16>& values, StdVT<T>& dMin, StdVT<T>& dMax);
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+} // end namespace NTCodeBase
