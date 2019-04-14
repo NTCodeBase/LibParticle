@@ -45,51 +45,43 @@
 #include <algorithm>
 #include <cstring>
 
-namespace Partio
-{
+namespace Partio {
 using namespace std;
 
-void writeHoudiniStr(ostream& ostream, const string& s)
-{
+void writeHoudiniStr(ostream& ostream, const string& s) {
     write<BIGEND>(ostream, (short)s.size());
     ostream.write(s.c_str(), s.size());
 }
 
 template<class T>
-struct Helper
-{
+struct Helper {
     T   addAttribute(ParticlesDataMutable* simple, const char* name, ParticleAttributeType type, int size);
     int registerIndexedStr(const T& attribute, const char* str);
 };
 template<>
-struct Helper<ParticleAttribute>
-{
+struct Helper<ParticleAttribute> {
     ParticleAttribute addAttribute(ParticlesDataMutable* simple, const char* name, ParticleAttributeType type, int size) { return simple->addAttribute(name, type, size); }
     int registerIndexedStr(ParticlesDataMutable* simple, const ParticleAttribute& attribute, const char* str) { return simple->registerIndexedStr(attribute, str); }
 };
 template<>
-struct Helper<FixedAttribute>
-{
+struct Helper<FixedAttribute> {
     FixedAttribute addAttribute(ParticlesDataMutable* simple, const char* name, ParticleAttributeType type, int size) { return simple->addFixedAttribute(name, type, size); }
     int registerIndexedStr(ParticlesDataMutable* simple, const FixedAttribute& attribute, const char* str) { return simple->registerFixedIndexedStr(attribute, str); }
 };
 
 class DummyAttribute {};
 template<>
-struct Helper<DummyAttribute>
-{
-    DummyAttribute addAttribute(ParticlesDataMutable* simple, const char* name, ParticleAttributeType type, int size) { return DummyAttribute(); }
-    int registerIndexedStr(ParticlesDataMutable* simple, const DummyAttribute& attribute, const char* str) { return 0; }
+struct Helper<DummyAttribute> {
+    DummyAttribute addAttribute(ParticlesDataMutable*, const char*, ParticleAttributeType, int) { return DummyAttribute(); }
+    int registerIndexedStr(ParticlesDataMutable*, const DummyAttribute&, const char*) { return 0; }
 };
-struct DummyAccessor
-{
+struct DummyAccessor {
     template<class T>
     DummyAccessor(const T& /*attr*/) {}
 };
 
 template<class TAttribute, class TAccessor>
-bool getAttributes(int& particleSize, vector<int>& attrOffsets, vector<TAttribute>& attrHandles, vector<TAccessor>& accessors, int nAttrib, istream* input, ParticlesDataMutable* simple, bool headersOnly, std::ostream* errorStream)
-{
+bool getAttributes(int& particleSize, vector<int>& attrOffsets, vector<TAttribute>& attrHandles, vector<TAccessor>& accessors, int nAttrib, istream* input, ParticlesDataMutable* simple, bool headersOnly, std::ostream* errorStream) {
     Helper<TAttribute> helper;
     for(int i = 0; i < nAttrib; i++) {
         unsigned short nameLength;
@@ -121,7 +113,7 @@ bool getAttributes(int& particleSize, vector<int>& attrOffsets, vector<TAttribut
             for(int ii = 0; ii < numIndices; ii++) {
                 unsigned short indexNameLength;
                 read<BIGEND>(*input, indexNameLength);
-                char* indexName = new char[indexNameLength + 1];;
+                char* indexName = new char[indexNameLength + 1];
                 input->read(indexName, indexNameLength);
                 indexName[indexNameLength] = 0;
                 if(!headersOnly) {
@@ -151,20 +143,18 @@ bool getAttributes(int& particleSize, vector<int>& attrOffsets, vector<TAttribut
 }
 
 // read buffer, seekg doesn't work with gzip
-void skip(istream* input, size_t numChars)
-{
+void skip(istream* input, size_t numChars) {
     static const size_t bufferSize = 4096;
     static char         buffer[bufferSize];
     while(numChars > 0) {
-        int toRead = std::min(numChars, bufferSize);
+        auto toRead = std::min(numChars, bufferSize);
         input->read(buffer, toRead);
         numChars -= toRead;
     }
 }
 
 // ignore primitive attributes, only know about Particle Systems currently
-bool skipPrimitives(int nPoints, int nPrims, int nPrimAttrib, istream* input, std::ostream* errorStream)
-{
+bool skipPrimitives(int nPoints, int nPrims, int nPrimAttrib, istream* input, std::ostream* errorStream) {
     int                    particleSize = 0;
     vector<int>            primAttrOffsets; // offsets in # of 32 bit offsets
     vector<DummyAttribute> primAttrHandles;
@@ -191,8 +181,7 @@ bool skipPrimitives(int nPoints, int nPrims, int nPrimAttrib, istream* input, st
     return true;
 }
 
-ParticlesDataMutable* readBGEO(const char* filename, const bool headersOnly, std::ostream* errorStream)
-{
+ParticlesDataMutable* readBGEO(const char* filename, const bool headersOnly, std::ostream* errorStream) {
     unique_ptr<istream> input(Gzip_In(filename, ios::in | ios::binary));
     if(!*input) {
         if(errorStream) { *errorStream << "Partio: Unable to open file " << filename << endl; }
@@ -305,8 +294,7 @@ ParticlesDataMutable* readBGEO(const char* filename, const bool headersOnly, std
     return simple;
 }
 
-bool writeBGEO(const char* filename, const ParticlesData& p, const bool compressed, std::ostream* errorStream)
-{
+bool writeBGEO(const char* filename, const ParticlesData& p, const bool compressed, std::ostream* errorStream) {
     unique_ptr<ostream> output(
         compressed ?
         Gzip_Out(filename, ios::out | ios::binary)
@@ -349,7 +337,7 @@ bool writeBGEO(const char* filename, const ParticlesData& p, const bool compress
                 int                             houdiniType = 4;
                 unsigned short                  size        = attr.count;
                 const std::vector<std::string>& indexTable  = p.indexedStrs(attr);
-                int                             numIndexes  = indexTable.size();
+                int                             numIndexes  = (int)indexTable.size();
                 write<BIGEND>(*output, size, houdiniType, numIndexes);
                 for(int i = 0; i < numIndexes; i++) {
                     writeHoudiniStr(*output, indexTable[i]);
@@ -419,7 +407,7 @@ bool writeBGEO(const char* filename, const ParticlesData& p, const bool compress
             int                             houdiniType = 4;
             unsigned short                  size        = attr.count;
             const std::vector<std::string>& indexTable  = p.fixedIndexedStrs(attr);
-            int                             numIndexes  = indexTable.size();
+            int                             numIndexes  = (int)indexTable.size();
             write<BIGEND>(*output, size, houdiniType, numIndexes);
             for(int ii = 0; ii < numIndexes; ii++) {
                 writeHoudiniStr(*output, indexTable[ii]);
