@@ -445,6 +445,14 @@ template<Int N, class Real_t> bool loadParticlesFromBGEO(const String& fileName,
         return false;
     }
     ////////////////////////////////////////////////////////////////////////////////
+    if(Partio::FixedAttribute attrRadius; bgeoParticles->fixedAttributeInfo("pscale", attrRadius)) {
+        const float* radius = bgeoParticles->fixedData<float>(attrRadius);
+        if(std::abs(particleRadius) < Real_t(1e-10)) {
+            particleRadius = static_cast<Real_t>(radius[0]);
+        } else {
+            __NT_REQUIRE(std::abs(particleRadius - radius[0]) < MEpsilon<Real_t>());
+        }
+    }
     if(Partio::ParticleAttribute attrRadius; bgeoParticles->attributeInfo("pscale", attrRadius)) {
         const float* radius = bgeoParticles->data<float>(attrRadius, 0);
         if(std::abs(particleRadius) < Real_t(1e-10)) {
@@ -453,6 +461,7 @@ template<Int N, class Real_t> bool loadParticlesFromBGEO(const String& fileName,
             __NT_REQUIRE(std::abs(particleRadius - radius[0]) < MEpsilon<Real_t>());
         }
     }
+    ////////////////////////////////////////////////////////////////////////////////
     positions.resize(bgeoParticles->numParticles());
     auto* positionsPtr = reinterpret_cast<Real_t*>(positions.data());
     for(int p = 0; p < bgeoParticles->numParticles(); ++p) {
@@ -517,18 +526,17 @@ template<Int N, class Real_t> bool saveParticlesToObj(const String& fileName, co
 
 template<Int N, class Real_t> bool saveParticlesToBGEO(const String& fileName, const StdVT_VecX<N, Real_t>& positions, Real_t particleRadius) {
     Partio::ParticlesDataMutable* bgeoParticle = Partio::create();
-    Partio::ParticleAttribute     attrRadius   = bgeoParticle->addAttribute("pscale", Partio::FLOAT, 1);
+    Partio::FixedAttribute        attrRadius   = bgeoParticle->addFixedAttribute("pscale", Partio::FLOAT, 1);
     Partio::ParticleAttribute     attrPosition = bgeoParticle->addAttribute("position", Partio::VECTOR, 3);
-
+    ////////////////////////////////////////////////////////////////////////////////
+    bgeoParticle->fixedDataWrite<float>(attrRadius)[0] = static_cast<float>(particleRadius);
+    bgeoParticle->addParticles(static_cast<int>(positions.size()));
     const auto* positionsPtr = reinterpret_cast<const Real_t*>(positions.data());
+    ////////////////////////////////////////////////////////////////////////////////
     for(size_t p = 0; p < positions.size(); ++p) {
-        size_t particle = bgeoParticle->addParticle();
-        float* radius   = bgeoParticle->dataWrite<float>(attrRadius, particle);
-        float* pos      = bgeoParticle->dataWrite<float>(attrPosition, particle);
-
-        radius[0] = static_cast<float>(particleRadius);
-        pos[0]    = static_cast<float>(positionsPtr[p * N]);
-        pos[1]    = static_cast<float>(positionsPtr[p * N + 1]);
+        float* pos = bgeoParticle->dataWrite<float>(attrPosition, p);
+        pos[0] = static_cast<float>(positionsPtr[p * N]);
+        pos[1] = static_cast<float>(positionsPtr[p * N + 1]);
         if constexpr(N == 3) {
             pos[2] = static_cast<float>(positionsPtr[p * N + 2]);
         } else {
