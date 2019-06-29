@@ -107,7 +107,7 @@ public:
     }
 
     void addFixedAttribute(const String& attrName, DataType type, ElementSize size, UInt count = 1) {
-        __NT_REQUIRE(type == TypeChar || type == TypeInt || type == TypeUInt || type == TypeReal);
+        NT_REQUIRE(type == TypeChar || type == TypeInt || type == TypeUInt || type == TypeReal);
         m_FixedAttributes[attrName] = std::make_shared<Attribute>(attrName, type, size, count);
     }
 

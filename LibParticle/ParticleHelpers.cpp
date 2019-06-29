@@ -177,7 +177,7 @@ void compress(const StdVT<Real_t>& dvec, DataBuffer& buffer, bool bWriteVectorSi
 template<class Real_t>
 void compress(const StdVT<StdVT<Real_t>>& dvec, StdVT<Real_t>& dMin, StdVT<Real_t>& dMax, StdVT<StdVT_UInt16>& compressedData) {
     static_assert(std::is_floating_point_v<Real_t>);
-    __NT_REQUIRE(dvec.size() == dMin.size() && dvec.size() == dMax.size());
+    NT_REQUIRE(dvec.size() == dMin.size() && dvec.size() == dMax.size());
     ////////////////////////////////////////////////////////////////////////////////
     compressedData.resize(dvec.size());
     ParallelExec::run(dvec.size(), [&](size_t i) { compress(dvec[i], dMin[i], dMax[i], compressedData[i]); });
@@ -216,7 +216,7 @@ template<Int N, class Real_t>
 void decompress(StdVT_VecX<N, Real_t>& dvec, const VecX<N, Real_t>& dMin, const VecX<N, Real_t>& dMax, const StdVT_UInt16& compressedData) {
     static_assert(std::is_floating_point_v<Real_t>);
     const VecX<N, Real_t> diff = dMax - dMin;
-    __NT_REQUIRE((compressedData.size() / N) * N == compressedData.size());
+    NT_REQUIRE((compressedData.size() / N) * N == compressedData.size());
     dvec.resize(compressedData.size() / N);
     ParallelExec::run(dvec.size(),
                       [&](size_t i) {
@@ -251,7 +251,7 @@ void decompress(StdVT_VecX<N, Real_t>& dvec, const DataBuffer& buffer, UInt nPar
     segmentStart += segmentSize;
 
     segmentSize = nParticles * N * sizeof(UInt16);
-    __NT_REQUIRE(segmentStart + segmentSize == buffer.size());
+    NT_REQUIRE(segmentStart + segmentSize == buffer.size());
     StdVT_UInt16 compressedData(nParticles * N);
     memcpy(compressedData.data(), &buffer.data()[segmentStart], segmentSize);
 
@@ -269,7 +269,7 @@ void decompress(StdVT<MatXxX<N, Real_t>>& dvec, Real_t dMin, Real_t dMax, const 
     static_assert(std::is_floating_point_v<Real_t>);
     Int          NN   = N * N;
     const Real_t diff = dMax - dMin;
-    __NT_REQUIRE((compressedData.size() / NN) * NN == compressedData.size());
+    NT_REQUIRE((compressedData.size() / NN) * NN == compressedData.size());
 
     dvec.resize(compressedData.size() / NN);
     ParallelExec::run(dvec.size(),
@@ -306,7 +306,7 @@ void decompress(StdVT<MatXxX<N, Real_t>>& dvec, const DataBuffer& buffer, UInt n
     segmentStart += segmentSize;
 
     segmentSize = nParticles * N * N * sizeof(UInt16);
-    __NT_REQUIRE(segmentStart + segmentSize == buffer.size());
+    NT_REQUIRE(segmentStart + segmentSize == buffer.size());
     StdVT_UInt16 compressedData(nParticles * N * N);
     memcpy(compressedData.data(), &buffer.data()[segmentStart], segmentSize);
 
@@ -348,7 +348,7 @@ void decompress(StdVT<Real_t>& dvec, const DataBuffer& buffer, UInt nParticles /
     segmentStart += segmentSize;
 
     segmentSize = nParticles * sizeof(UInt16);
-    __NT_REQUIRE(segmentStart + segmentSize == buffer.size());
+    NT_REQUIRE(segmentStart + segmentSize == buffer.size());
     StdVT_UInt16 compressedData(nParticles);
     memcpy(compressedData.data(), &buffer.data()[segmentStart], segmentSize);
 
@@ -361,7 +361,7 @@ void decompress(StdVT<Real_t>& dvec, const DataBuffer& buffer, UInt nParticles /
 template<class Real_t>
 void decompress(StdVT<StdVT<Real_t>>& dvec, const StdVT<Real_t>& dMin, const StdVT<Real_t>& dMax, const StdVT<StdVT_UInt16>& compressedData) {
     static_assert(std::is_floating_point_v<Real_t>);
-    __NT_REQUIRE(compressedData.size() == dMin.size() && compressedData.size() == dMax.size());
+    NT_REQUIRE(compressedData.size() == dMin.size() && compressedData.size() == dMax.size());
 
     dvec.resize(compressedData.size());
     ParallelExec::run(dvec.size(), [&](size_t i) { decompress(dvec[i], dMin[i], dMax[i], compressedData[i]); });
@@ -399,7 +399,7 @@ void decompress(StdVT<StdVT<Real_t>>& dvec, const DataBuffer& buffer, UInt nPart
 
         compressedData[i].resize(iSize);
         segmentSize = iSize * sizeof(UInt16);
-        __NT_REQUIRE(segmentStart + segmentSize <= buffer.size());
+        NT_REQUIRE(segmentStart + segmentSize <= buffer.size());
         memcpy(compressedData[i].data(), &buffer.data()[segmentStart], segmentSize);
     }
 
@@ -450,7 +450,7 @@ template<Int N, class Real_t> bool loadParticlesFromBGEO(const String& fileName,
         if(std::abs(particleRadius) < Real_t(1e-10)) {
             particleRadius = static_cast<Real_t>(radius[0]);
         } else {
-            __NT_REQUIRE(std::abs(particleRadius - radius[0]) < MEpsilon<Real_t>());
+            NT_REQUIRE(std::abs(particleRadius - radius[0]) < MEpsilon<Real_t>());
         }
     }
     if(Partio::ParticleAttribute attrRadius; bgeoParticles->attributeInfo("pscale", attrRadius)) {
@@ -458,7 +458,7 @@ template<Int N, class Real_t> bool loadParticlesFromBGEO(const String& fileName,
         if(std::abs(particleRadius) < Real_t(1e-10)) {
             particleRadius = static_cast<Real_t>(radius[0]);
         } else {
-            __NT_REQUIRE(std::abs(particleRadius - radius[0]) < MEpsilon<Real_t>());
+            NT_REQUIRE(std::abs(particleRadius - radius[0]) < MEpsilon<Real_t>());
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
@@ -628,7 +628,7 @@ void connectedComponentAnalysis(const StdVT<StdVT_UInt>& connectionList, StdVT_I
         }
     }
 
-    __NT_REQUIRE(nProcessed == connectionList.size());
+    NT_REQUIRE(nProcessed == connectionList.size());
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
